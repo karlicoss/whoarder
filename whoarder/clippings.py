@@ -122,14 +122,23 @@ class ClippingsIterator(object):
                                         clipping_buffer[1])
 
         try:
-            line_dict = self._clipping_line1.search(clipping_buffer[0]).groupdict()
+            auth_found = self._clipping_line1.search(clipping_buffer[0])
+            line_dict = None
+            if auth_found:
+                line_dict = auth_found.groupdict()
+            else:
+                line_dict = {
+                    'book': clipping_buffer[0],
+                    'author': 'N/A',
+                }
             line_dic2 = self._clipping_line2.search(clipping_buffer[1]).groupdict()
             line_dict.update(line_dic2)
             line_dict['contents'] = clipping_buffer[3]
             return line_dict
-        except AttributeError:
+        except AttributeError as ee:
             print("Failed to import the following note, please report to https://github.com/ronjouch/whoarder :\n  {0}\n".format(clipping_buffer))
             return self.__next__()
+
 
 
 def _detect_encoding(source):
